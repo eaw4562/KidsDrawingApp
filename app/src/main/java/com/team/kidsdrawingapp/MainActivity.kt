@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.media.MediaScannerConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -237,6 +238,7 @@ class MainActivity : AppCompatActivity() {
                         cancleProgressDialog()
                         if(result.isNotEmpty()) {
                             Toast.makeText(this@MainActivity, "파일저장 성공 : $result", Toast.LENGTH_SHORT).show()
+                            shareImage(result)
                         }else {
                             Toast.makeText(this@MainActivity,"파일 저장 실패", Toast.LENGTH_SHORT).show()
                         }
@@ -262,6 +264,19 @@ class MainActivity : AppCompatActivity() {
         if(customProgressDialog != null){
             customProgressDialog?.dismiss()
             customProgressDialog = null
+        }
+    }
+
+    private fun shareImage(result: String){
+
+        MediaScannerConnection.scanFile(this, arrayOf(result), null ){
+            path, uri ->
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            shareIntent.type = "image/png"
+            startActivity(Intent.createChooser(shareIntent, "Share"))
+
         }
     }
 }
